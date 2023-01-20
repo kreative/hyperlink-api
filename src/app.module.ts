@@ -4,6 +4,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
 
 import { SentryModule } from './sentry/sentry.module';
+import { ClicksModule } from './clicks/clicks.module';
+import { LinksModule } from './links/links.module';
 import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 
@@ -18,6 +20,8 @@ import '@sentry/tracing';
       debug: true,
     }),
     PrismaModule,
+    ClicksModule,
+    LinksModule,
   ],
   controllers: [AppController],
   providers: [],

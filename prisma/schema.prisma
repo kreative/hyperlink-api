@@ -11,7 +11,36 @@ datasource db {
 }
 
 model Link {
-  id     Int    @id @default(autoincrement())
-  target String
-  code   String @unique
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  extension  String   @unique
+  clickCount Int      @default(0)
+  active     Boolean  @default(true)
+  ghost      Boolean  @default(true)
+  target     String
+  ksn        Int?
+  clicks     Click[]
+}
+
+model Click {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  ipAddress     String
+  browser       String
+  platform      String
+  deviceType    String
+  os            String
+  continentCode String
+  countryCode   String
+  regionCode    String
+  city          String
+  zip           String
+  latitude      String
+  longitute     String
+  languageCode  String
+  timezone      String
+  link          Link     @relation(fields: [linkId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  linkId        Int
 }

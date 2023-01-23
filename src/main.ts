@@ -17,6 +17,8 @@ async function bootstrap() {
   app.enableCors();
   // removes any data from request bodies that don't fit the DTO
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+   // adds /v1 before any route, used for API versioning
+   app.setGlobalPrefix('/v1');
 
   logger.info(
     `id-api starting on port: ${PORT} enviroment: ${process.env.ENVIROMENT}`,

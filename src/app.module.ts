@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
@@ -8,6 +13,8 @@ import { ClicksModule } from './clicks/clicks.module';
 import { LinksModule } from './links/links.module';
 import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
+import { IpInfoMiddlewware } from '../middleware/ipinfo.middleware';
+import { ClicksController } from './clicks/clicks.controller';
 
 @Module({
   imports: [
@@ -33,5 +40,8 @@ export class AppModule implements NestModule {
       path: '*',
       method: RequestMethod.ALL,
     });
+
+    // adds middleware for getting data based on ip info for Clicks controller
+    consumer.apply(IpInfoMiddlewware).forRoutes(ClicksController);
   }
 }

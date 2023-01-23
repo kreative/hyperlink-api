@@ -15,7 +15,7 @@ import logger from '../../utils/logger';
 import { NewLinkDto, UpdateLinkDto } from './links.dto';
 import { LinksService } from './links.service';
 
-@Controller('v1/links')
+@Controller('links')
 export class LinksController {
   constructor(private linksService: LinksService) {}
 

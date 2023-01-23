@@ -2,7 +2,7 @@ import { Controller, Get, HttpException } from '@nestjs/common';
 
 import logger from "../utils/logger";
 
-@Controller('v1')
+@Controller('')
 export class AppController {
   @Get()
   async home(): Promise<string> {

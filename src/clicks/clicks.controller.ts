@@ -12,13 +12,11 @@ import { ClicksService } from './clicks.service';
 import { IClientIpinfoRequest } from '../../types/IClientIpinfoRequest';
 import { IResponse } from '../../types/IResponse';
 
-// since the clicks controller is used to transform a link from an extension to a redirect
-// this controller has to be empty from a global Controller class perspective
-@Controller('')
+@Controller('clicks')
 export class ClicksController {
   constructor(private clicksService: ClicksService) {}
 
-  @Get(':extension')
+  @Get('transform/:extension')
   @HttpCode(HttpStatus.OK)
   async transformAndCreateClick(
     @Req() req: IClientIpinfoRequest,

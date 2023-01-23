@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Link } from '@prisma/client';
 import { customAlphabet } from 'nanoid';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { IResponse } from 'types/IResponse';
-import { handlePrismaErrors } from 'utils/handlePrismaErrors';
-import logger from 'utils/logger';
+import { PrismaService } from '../../src/prisma/prisma.service';
+import { IResponse } from '../../types/IResponse';
+import { handlePrismaErrors } from '../../utils/handlePrismaErrors';
+import logger from '../../utils/logger';
 import { NewLinkDto, UpdateLinkDto } from './links.dto';
 
 @Injectable()
@@ -53,7 +53,10 @@ export class LinksService {
       });
     } catch (error) {
       // handles any errors thrown by prisma
-      logger.error(`prisma.link.create in createGhostLink error: ${error}`);
+      logger.error({
+        message: `prisma.link.create in createGhostLink failed`,
+        error,
+      });
       handlePrismaErrors(error);
     }
 
@@ -63,7 +66,8 @@ export class LinksService {
       data: { link },
     };
 
-    logger.info(`createGhostLink passed with payload: ${payload}`);
+    logger.info({ message: `createGhostLink passed`, payload });
+
     return payload;
   }
 
@@ -81,6 +85,30 @@ export class LinksService {
     return payload;
   }
 
+  // returns ALL links in the Hyperlink database
+  async getLinks(): Promise<IResponse> {
+    let links: Link[];
+
+    try {
+      // attempts to retrieve all links in the database
+      logger.info(`prisma.links.findMany initiated`);
+      links = await this.prisma.link.findMany();
+    } catch (error) {
+      // some sort of prisma error occured
+      logger.error(`prisma.links.findMany error: ${error}`);
+      handlePrismaErrors(error);
+    }
+
+    const payload: IResponse = {
+      statusCode: 200,
+      message: 'Links found',
+      data: { links },
+    };
+
+    logger.info({ message: `getLinks passed`, payload });
+    return payload;
+  }
+
   // updates target and extension for a link with a given id
   // in the client side, if only the target or the extension is updated and not the other
   // the client will still send both over tho this method
@@ -93,25 +121,38 @@ export class LinksService {
     if (dto.extensionChanged) {
       try {
         // tries to find a link with the given extension
-        logger.info(
-          `prisma.link.findUnique for extension ${dto.extension} initiated`,
-        );
+        logger.info(`prisma.link.findUnique for :${dto.extension} initiated`);
         link = await this.prisma.link.findUnique({
           where: { extension: dto.extension },
         });
       } catch (error) {
         // handles any prisma errors that come up
-        logger.error(
-          `prisma.link.findUnique for extension ${dto.extension} error: ${error}`,
-        );
+        logger.error({
+          message: `prisma.link.findUnique for :${dto.extension} failed`,
+          error,
+        });
         handlePrismaErrors(error);
       }
 
       // checks if there is no link with the current extension, if there is then throw error
+      // and if the id of the POST request and the id (link.id) of the found link are the same then nothing happens
+      // this is because that means that updating the extension will have no actual affect on the link
       // if no link is found, extension is unique and the rest of the method can continue
-      if (link !== null) {
+      if (link !== null && link.id !== id) {
+        logger.debug(`extension :${dto.extension} taken in updateLink`);
         throw new ForbiddenException('extension taken');
       }
+    }
+
+    // creates an object for the update operation, no extension is initialized
+    let data: any = {
+      target: dto.target
+    };
+
+    // only adds a new extension if the post request body has extensionChanged === true
+    if (dto.extensionChanged) {
+      // adds the new extension to the update data object
+      data.extension = dto.extension;
     }
 
     try {
@@ -119,14 +160,11 @@ export class LinksService {
       logger.info(`prisma.link.update for ${id} initiated with body: ${dto}`);
       linkChange = await this.prisma.link.update({
         where: { id },
-        data: {
-          extension: dto.extension,
-          target: dto.target,
-        },
+        data,
       });
     } catch (error) {
       // handles any prisma errors that come up
-      logger.error(`prisma.link.update for ${id} error: ${error}`);
+      logger.error({ message: `prisma.link.update for ${id} failed`, error });
       handlePrismaErrors(error);
     }
 
@@ -136,7 +174,7 @@ export class LinksService {
       data: { linkChange },
     };
 
-    logger.info(`updateLink succedded for ${id} with payload: ${payload}`);
+    logger.info({ message: `updateLink succedded for ${id}`, payload });
     return payload;
   }
 
@@ -149,22 +187,25 @@ export class LinksService {
       linkChange = await this.prisma.link.update({
         where: { id },
         data: {
-          active: false
-        }
+          active: false,
+        },
       });
     } catch (error) {
       // handles any prisma errors that come up
-      logger.info(`prisma.link.update for ${id} for deactivation error: ${error}`);
+      logger.info({
+        message: `prisma.link.update for ${id} for deactivation failed`,
+        error,
+      });
       handlePrismaErrors(error);
     }
 
     const payload: IResponse = {
       statusCode: 200,
-      message: "Link deactivated",
-      data: { linkChange }
+      message: 'Link deactivated',
+      data: { linkChange },
     };
 
-    logger.info(`deactivateLink for ${id} passed with payload: ${payload}`);
+    logger.info({ message: `deactivateLink for ${id} passed`, payload });
     return payload;
   }
 }

@@ -30,7 +30,7 @@ export class ClicksService {
       // tries to find the link using the extension
       logger.info(`prisma.link.findUnique with ext: ${extension} initiated`);
       link = await this.prisma.link.findUnique({
-        where: { extension }
+        where: { extension },
       });
     } catch (error) {
       // hanels any prisma errors that come up
@@ -47,7 +47,9 @@ export class ClicksService {
     // or if for some reason a deactivated link is looked up we wil return a NotFoundException
     if (link === null || !link.active) {
       logger.warn(`no active link found with ext: ${extension}`);
-      throw new NotFoundException(`active link not found with ext: ${extension}`);
+      throw new NotFoundException(
+        `active link not found with ext: ${extension}`,
+      );
     }
 
     // create a new entry in the clicks database using ipinfo

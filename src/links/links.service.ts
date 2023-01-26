@@ -95,7 +95,7 @@ export class LinksService {
       links = await this.prisma.link.findMany();
     } catch (error) {
       // some sort of prisma error occured
-      logger.error(`prisma.links.findMany error: ${error}`);
+      logger.error({ message: `prisma.links.findMany failed`, error });
       handlePrismaErrors(error);
     }
 

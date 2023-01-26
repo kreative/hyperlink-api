@@ -27,7 +27,7 @@ export class LinksController {
   @HttpCode(HttpStatus.OK)
   async createGhostLink(@Body() dto: NewLinkDto): Promise<IResponse> {
     // creates a new link that doesn't belong to any user
-    logger.info(`POST /links/ghost inititated with body: ${dto}`);
+    logger.info({ message: `POST /links/ghost inititated`, body: dto });
     return this.linksService.createGhostLink(dto);
   }
 

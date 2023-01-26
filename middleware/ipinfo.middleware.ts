@@ -20,7 +20,10 @@ export class IpInfoMiddlewware implements NestMiddleware {
       .lookupIp(ipAddress)
       .then((response: IPinfo) => {
         // ipinfo api worked and there are no errors from the node library as well
-        logger.debug(`ip lookup for ${ipAddress} found: ${response}`);
+        logger.debug({
+          message: `ip lookup for ${ipAddress} found response`,
+          response,
+        });
         console.log(response);
         // attach the data from node-ipinfo onto the response object body
         req.body.ipinfoData = response as any;
@@ -32,10 +35,16 @@ export class IpInfoMiddlewware implements NestMiddleware {
         // a positive response... if no data comes from this middleware, null will be provided in the database
         if (error instanceof ApiLimitError) {
           // this error will happen if we exceed our limit for API usage, shouldn't happen often
-          logger.fatal(`ip lookup for ${ipAddress} failed with ApiLimitError: ${error}`);
+          logger.fatal({
+            message: `ip lookup for ${ipAddress} failed with ApiLimitError`,
+            error,
+          });
         } else {
           // this is any sort of other unknown error
-          logger.fatal(`ip lookup for ${ipAddress} failed with unknown error: ${error}`);
+          logger.fatal({
+            message: `ip lookup for ${ipAddress} failed with unknown error`,
+            error,
+          });
         }
       })
       .finally(() => {

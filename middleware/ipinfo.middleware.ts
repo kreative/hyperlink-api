@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import IPinfoWrapper, { IPinfo, ApiLimitError } from 'node-ipinfo';
 import * as requestIp from 'request-ip';
 import { IClientIpinfoRequest } from 'types/IClientIpinfoRequest';

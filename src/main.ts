@@ -16,8 +16,6 @@ async function bootstrap() {
   // adds cross origin reference abilities
   app.enableCors({
     origin: [
-      // local domains for local development
-      "http://localhost:3000",
       // http/https domains for hyperlink-client
       "http://kreativehyperlink.com",
       "https://kreativehyperlink.com",

@@ -14,7 +14,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // adds cross origin reference abilities
-  app.enableCors();
+  app.enableCors({
+    origin: [
+      // http/https domains for hyperlink-client
+      "http://kreativehyperlink.com",
+      "https://kreativehyperlink.com",
+      // http/https domains for hyperlink-transformer
+      "http://khyper.link",
+      "https://khyper.link",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  });
   // removes any data from request bodies that don't fit the DTO
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
    // adds /v1 before any route, used for API versioning

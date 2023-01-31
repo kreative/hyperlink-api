@@ -1,6 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Link } from '@prisma/client';
 import { customAlphabet } from 'nanoid';
+import { IAuthenticatedRequest } from 'types/IAuthenticatedRequest';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { IResponse } from '../../types/IResponse';
 import { handlePrismaErrors } from '../../utils/handlePrismaErrors';
@@ -67,35 +72,74 @@ export class LinksService {
     };
 
     logger.info({ message: `createGhostLink passed`, payload });
-
     return payload;
   }
 
   // for now this method will return a positive response
   // when we add authentication, this method will be able to work
-  async createUserLink(dto: NewLinkDto): Promise<IResponse> {
-    // modifying certain default values
+  async createUserLink(
+    req: IAuthenticatedRequest,
+    dto: NewLinkDto,
+  ): Promise<IResponse> {
+    // empty link object that will store new link created
+    let link: Link;
+
+    // modifying certain default values from the schema
     const ghost: boolean = false;
+    const ksn: number = req.kreativeAccount.ksn;
+
+    // creates a new, unique extension
+    const extension: string = await this.generateExtension();
+
+    try {
+      // creates a new link in the database using prisma
+      logger.info(`prisma.link.create in createUserLink initiated`);
+      link = await this.prisma.link.create({
+        data: {
+          target: dto.target,
+          extension,
+          ksn,
+          ghost,
+        },
+      });
+    } catch (error) {
+      // some sort of prisma error occured and has been handled
+      logger.error({
+        message: 'prisma.link.create in createUserLink failed',
+        error,
+      });
+      handlePrismaErrors(error);
+    }
 
     const payload: IResponse = {
       statusCode: 200,
       message: 'User link created',
+      data: { link },
     };
 
+    logger.info({ message: 'createUserLink passed', payload });
     return payload;
   }
 
-  // returns ALL links in the Hyperlink database
-  async getLinks(): Promise<IResponse> {
+  // returns ALL links in the Hyperlink database for a specific user
+  // eventually we need to implement pagination
+  async getLinks(req: IAuthenticatedRequest): Promise<IResponse> {
+    // empty links array object that will be used to store data
     let links: Link[];
+
+    // gets the ksn from the request object
+    const ksn: number = req.kreativeAccount.ksn;
 
     try {
       // attempts to retrieve all links in the database
-      logger.info(`prisma.links.findMany initiated`);
-      links = await this.prisma.link.findMany();
+      logger.info(`prisma.links.findMany initiated for ${ksn}`);
+      links = await this.prisma.link.findMany({ where: { ksn } });
     } catch (error) {
       // some sort of prisma error occured
-      logger.error({ message: `prisma.links.findMany failed`, error });
+      logger.error({
+        message: `prisma.links.findMany failed for ${ksn}`,
+        error,
+      });
       handlePrismaErrors(error);
     }
 
@@ -112,7 +156,11 @@ export class LinksService {
   // updates target and extension for a link with a given id
   // in the client side, if only the target or the extension is updated and not the other
   // the client will still send both over tho this method
-  async updateLink(id: number, dto: UpdateLinkDto): Promise<IResponse> {
+  async updateLink(
+    req: IAuthenticatedRequest,
+    id: number,
+    dto: UpdateLinkDto,
+  ): Promise<IResponse> {
     let link: Link;
     let linkChange: any;
 
@@ -134,6 +182,17 @@ export class LinksService {
         handlePrismaErrors(error);
       }
 
+      // checks to see if the KSN from the authenticated user is the same as the one on the link
+      const ksn: number = req.kreativeAccount.ksn;
+
+      if (ksn !== link.ksn) {
+        logger.fatal({
+          message: `ksn mismatch in updateLink`,
+          info: { userKsn: ksn, linkKsn: link.ksn },
+        });
+        throw new UnauthorizedException('ksn mismatch');
+      }
+
       // checks if there is no link with the current extension, if there is then throw error
       // and if the id of the POST request and the id (link.id) of the found link are the same then nothing happens
       // this is because that means that updating the extension will have no actual affect on the link
@@ -146,7 +205,7 @@ export class LinksService {
 
     // creates an object for the update operation, no extension is initialized
     let data: any = {
-      target: dto.target
+      target: dto.target,
     };
 
     // only adds a new extension if the post request body has extensionChanged === true
@@ -178,11 +237,15 @@ export class LinksService {
     return payload;
   }
 
+  // though this is an authenticated method, we don't pass the request object
+  // because we don't use anything from the account object
+  // we are assuming that they are deactivating a link they own
   async deactivateLink(id: number): Promise<IResponse> {
+    // creates empty linkChange object to store data
     let linkChange: any;
 
     try {
-      // changes active to "false"
+      // changes active to "false" for the link
       logger.info(`prisma.link.update for ${id} for deactivation initiated`);
       linkChange = await this.prisma.link.update({
         where: { id },

@@ -26,7 +26,7 @@ export class IpInfoMiddlewware implements NestMiddleware {
         });
         console.log(response);
         // attach the data from node-ipinfo onto the response object body
-        req.body.ipinfoData = response as any;
+        req.ipinfoData = response as any;
       })
       .catch((error: any) => {
         // something went wrong with ipinfo's api or node library

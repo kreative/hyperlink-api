@@ -24,7 +24,7 @@ export class ClicksService {
     let linkChange: any;
 
     // loads ip info data from middleware
-    const ipinfo = req.body.ipinfoData;
+    const ipinfo = req.ipinfoData;
 
     try {
       // tries to find the link using the extension

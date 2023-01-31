@@ -76,6 +76,10 @@ export class AuthenticateMiddleware implements NestMiddleware {
               // in general, it's really the KSN that the subsequent methods need
               const account: any = response.data.data.account;
               req.kreativeAccount = account;
+              logger.info({
+                message: 'added account object to request body in middleware',
+                account,
+              });
 
               // calls next() once everything passes
               logger.info('authenticate middleware passed');

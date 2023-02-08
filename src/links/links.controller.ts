@@ -35,7 +35,10 @@ export class LinksController {
 
   @Post('user')
   @HttpCode(HttpStatus.OK)
-  async createUserLink(@Req() req: IAuthenticatedRequest, @Body() dto: NewLinkDto): Promise<IResponse> {
+  async createUserLink(
+    @Req() req: IAuthenticatedRequest,
+    @Body() dto: NewLinkDto,
+  ): Promise<IResponse> {
     // create a new account link (requires authentication)
     // authentication for this method will happen in some sort of middleware
     // therefore the "ksn" and user details will come from cookies/headers
@@ -68,11 +71,10 @@ export class LinksController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   async deactivateLink(
-    @Req() req: IAuthenticatedRequest,
     @Param('id', ParseIntPipe) id: number,
   ): Promise<IResponse> {
     // deactivate link, basically deleting a link using the ID
     logger.info(`DELETE /${id} initiated`);
-    return this.linksService.deactivateLink(req, id);
+    return this.linksService.deactivateLink(id);
   }
 }

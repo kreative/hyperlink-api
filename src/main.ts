@@ -2,7 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
-import helmet from "helmet";
+import helmet from 'helmet';
 import logger from '../utils/logger';
 
 // configures and loads enviroment variables from .env file
@@ -19,22 +19,22 @@ async function bootstrap() {
   // adds cross origin reference abilities
   app.enableCors({
     origin: [
-      "https://localhost:3000",
-      "http://localhost:3000",
+      'https://localhost:3000',
+      'http://localhost:3000',
       // http/https domains for hyperlink-client
-      "http://kreativehyperlink.com",
-      "https://kreativehyperlink.com",
+      'http://kreativehyperlink.com',
+      'https://kreativehyperlink.com',
       // http/https domains for hyperlink-transformer
-      "http://khyper.link",
-      "https://khyper.link",
+      'http://khyper.link',
+      'https://khyper.link',
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });
   // removes any data from request bodies that don't fit the DTO
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-   // adds /v1 before any route, used for API versioning
-   app.setGlobalPrefix('/v1');
+  // adds /v1 before any route, used for API versioning
+  app.setGlobalPrefix('/v1');
 
   logger.info(
     `id-api starting on port: ${PORT} enviroment: ${process.env.ENVIROMENT}`,

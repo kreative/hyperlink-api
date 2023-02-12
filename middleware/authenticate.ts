@@ -12,22 +12,30 @@ export class AuthenticateMiddleware implements NestMiddleware {
     // retrieve key and aidn from the request headers
     const key = req.headers['kreative_id_key'];
     const aidnString = req.headers['kreative_aidn'];
+    const appchain = req.headers['kreative_appchain'];
 
     // parses the AIDN header as string to an integer
     // @ts-ignore some sort of unassignable error is throw so we ignore the typescript error
     const aidn = parseInt(aidnString);
 
-    if (key === undefined || aidn === undefined) {
+    if (key === undefined || aidn === undefined || appchain === undefined) {
       // the neccessary headers are not in the request, so middleware should fail
-      logger.error('authenticate middleware sent 400 due to missing key, aidn');
-      res
-        .status(400)
-        .send({ statusCode: 400, message: 'key or aidn missing in headers' });
+      logger.error(
+        'authenticate middleware sent 400 due to missing key, aidn, or appchain',
+      );
+      res.status(400).send({
+        statusCode: 400,
+        message: 'key, aidn, or appchain missing in headers',
+      });
     }
 
     // verify the key using an AXIOS request to id-api
     axios
-      .post(`https://id-api.kreativeusa.com/v1/keychains/verify`, { key, aidn })
+      .post(`https://id-api.kreativeusa.com/v1/keychains/verify`, {
+        key,
+        aidn,
+        appchain,
+      })
       .then((response) => {
         console.log(response);
         // status code is between 200-299

@@ -18,11 +18,11 @@ export class LinksService {
 
   // creates a new, unique application id number
   async generateExtension(): Promise<string> {
-    let unique: boolean = false;
-    let newExt: string = '';
-    let characters: string = 'abcdefghijklmnopqrstuvwxyz1234567890';
+    let unique = false;
+    let newExt = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz1234567890';
     // create new 'nanoid' function with custom parameters
-    const nanoid: Function = customAlphabet(characters, 6);
+    const nanoid = customAlphabet(characters, 6);
     // loop to create a compltely unique ksn
     while (!unique) {
       // create new random ksn from function
@@ -85,7 +85,7 @@ export class LinksService {
     let link: Link;
 
     // modifying certain default values from the schema
-    const ghost: boolean = false;
+    const ghost = false;
     const ksn: number = req.kreativeAccount.ksn;
 
     // creates a new, unique extension
@@ -204,15 +204,10 @@ export class LinksService {
     }
 
     // creates an object for the update operation, no extension is initialized
-    let data: any = {
+    const data = {
+      extension: dto.extensionChanged ? dto.extension : undefined,
       target: dto.target,
     };
-
-    // only adds a new extension if the post request body has extensionChanged === true
-    if (dto.extensionChanged) {
-      // adds the new extension to the update data object
-      data.extension = dto.extension;
-    }
 
     try {
       // updates the extension and target for a certain link with link id

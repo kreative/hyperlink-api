@@ -9,6 +9,7 @@ import { IAuthenticatedRequest } from 'types/IAuthenticatedRequest';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { IResponse } from '../../types/IResponse';
 import { handlePrismaErrors } from '../../utils/handlePrismaErrors';
+import { getFavicon } from '../../utils/getFavicon';
 import logger from '../../utils/logger';
 import { GetAppQueryDto, NewLinkDto, UpdateLinkDto } from './links.dto';
 
@@ -83,6 +84,8 @@ export class LinksService {
   ): Promise<IResponse> {
     // empty link object that will store new link created
     let link: Link;
+    // empty favicon string that will store the favicon url
+    let favicon: string;
 
     // modifying certain default values from the schema
     const ghost = false;
@@ -92,11 +95,26 @@ export class LinksService {
     const extension: string = await this.generateExtension();
 
     try {
+      // gets the favicon from the target url
+      logger.info(`getFavicon in createUserLink initiated for ${dto.target}`);
+      favicon = await getFavicon(dto.target);
+    } catch (error) {
+      // some sort of error occured while getting the favicon
+      // sets the favicon to an empty string and logs the error
+      favicon = '';
+      logger.error({
+        message: `getFavicon in createUserLink failed for ${dto.target}`,
+        error,
+      });
+    }
+
+    try {
       // creates a new link in the database using prisma
       logger.info(`prisma.link.create in createUserLink initiated`);
       link = await this.prisma.link.create({
         data: {
           target: dto.target,
+          favicon,
           extension,
           ksn,
           ghost,
@@ -110,6 +128,8 @@ export class LinksService {
       });
       handlePrismaErrors(error);
     }
+
+    console.log(favicon);
 
     const payload: IResponse = {
       statusCode: 200,
@@ -187,7 +207,22 @@ export class LinksService {
   ): Promise<IResponse> {
     let link: Link;
     let linkChange: any;
+    // empty favicon string that will store the favicon url
+    let favicon: string;
 
+    try {
+      // gets the favicon from the target url
+      logger.info(`getFavicon in createUserLink initiated for ${dto.target}`);
+      favicon = await getFavicon(dto.target);
+    } catch (error) {
+      // some sort of error occured while getting the favicon
+      // sets the favicon to an empty string and logs the error
+      favicon = '';
+      logger.error({
+        message: `getFavicon in createUserLink failed for ${dto.target}`,
+        error,
+      });
+    }
     // here we check to see if the extension that was sent over is unique
     // since this method would also take an unchanged extension, we use extensionChanged to know when to check
     if (dto.extensionChanged) {
@@ -206,17 +241,6 @@ export class LinksService {
         handlePrismaErrors(error);
       }
 
-      // checks to see if the KSN from the authenticated user is the same as the one on the link
-      const ksn: number = req.kreativeAccount.ksn;
-
-      if (ksn !== link.ksn) {
-        logger.fatal({
-          message: `ksn mismatch in updateLink`,
-          info: { userKsn: ksn, linkKsn: link.ksn },
-        });
-        throw new UnauthorizedException('ksn mismatch');
-      }
-
       // checks if there is no link with the current extension, if there is then throw error
       // and if the id of the POST request and the id (link.id) of the found link are the same then nothing happens
       // this is because that means that updating the extension will have no actual affect on the link
@@ -231,6 +255,7 @@ export class LinksService {
     const data = {
       extension: dto.extensionChanged ? dto.extension : undefined,
       target: dto.target,
+      favicon,
     };
 
     try {

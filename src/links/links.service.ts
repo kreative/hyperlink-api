@@ -10,7 +10,7 @@ import { PrismaService } from '../../src/prisma/prisma.service';
 import { IResponse } from '../../types/IResponse';
 import { handlePrismaErrors } from '../../utils/handlePrismaErrors';
 import logger from '../../utils/logger';
-import { NewLinkDto, UpdateLinkDto } from './links.dto';
+import { GetAppQueryDto, NewLinkDto, UpdateLinkDto } from './links.dto';
 
 @Injectable()
 export class LinksService {
@@ -123,17 +123,28 @@ export class LinksService {
 
   // returns ALL links in the Hyperlink database for a specific user
   // eventually we need to implement pagination
-  async getLinks(req: IAuthenticatedRequest): Promise<IResponse> {
+  async getLinks(
+    req: IAuthenticatedRequest,
+    query: GetAppQueryDto,
+  ): Promise<IResponse> {
     // empty links array object that will be used to store data
     let links: Link[];
+    // empty number that will be used to store total count
+    let totalLinks: number;
 
     // gets the ksn from the request object
     const ksn: number = req.kreativeAccount.ksn;
+    // gets pagination data from the query object
+    const { limit, page } = query;
 
     try {
       // attempts to retrieve all links in the database
       logger.info(`prisma.links.findMany initiated for ${ksn}`);
-      links = await this.prisma.link.findMany({ where: { ksn } });
+      links = await this.prisma.link.findMany({
+        where: { ksn },
+        skip: page * limit - limit,
+        take: limit,
+      });
     } catch (error) {
       // some sort of prisma error occured
       logger.error({
@@ -143,10 +154,23 @@ export class LinksService {
       handlePrismaErrors(error);
     }
 
+    try {
+      // attempts to retrieve the total number of links in the database
+      logger.info(`prisma.links.count initiated for ${ksn}`);
+      totalLinks = await this.prisma.link.count({ where: { ksn } });
+    } catch (error) {
+      // some sort of prisma error occured
+      logger.error({
+        message: `prisma.links.count failed for ${ksn}`,
+        error,
+      });
+      handlePrismaErrors(error);
+    }
+
     const payload: IResponse = {
       statusCode: 200,
       message: 'Links found',
-      data: { links },
+      data: { links, totalLinks },
     };
 
     logger.info({ message: `getLinks passed`, payload });

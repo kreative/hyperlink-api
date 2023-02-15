@@ -9,12 +9,13 @@ import {
   ParseIntPipe,
   Post,
   Req,
+  Query,
 } from '@nestjs/common';
 import { IAuthenticatedRequest } from 'types/IAuthenticatedRequest';
 
 import { IResponse } from '../../types/IResponse';
 import logger from '../../utils/logger';
-import { NewLinkDto, UpdateLinkDto } from './links.dto';
+import { NewLinkDto, UpdateLinkDto, GetAppQueryDto } from './links.dto';
 import { LinksService } from './links.service';
 
 @Controller('links')
@@ -49,11 +50,14 @@ export class LinksController {
 
   @Get('')
   @HttpCode(HttpStatus.OK)
-  async getLinks(@Req() req: IAuthenticatedRequest): Promise<IResponse> {
+  async getLinks(
+    @Req() req: IAuthenticatedRequest,
+    @Query() query: GetAppQueryDto,
+  ): Promise<IResponse> {
     // this controller gets all of the links that our database currently holds
     // eventually this method will be modified to get all links held by a certain KSN
     logger.info(`GET /links initiated`);
-    return this.linksService.getLinks(req);
+    return this.linksService.getLinks(req, query);
   }
 
   @Post(':id')

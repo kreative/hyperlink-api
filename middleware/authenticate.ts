@@ -37,7 +37,6 @@ export class AuthenticateMiddleware implements NestMiddleware {
         appchain,
       })
       .then((response) => {
-        console.log(response);
         // status code is between 200-299
         if (response.data.statusCode === 200) {
           // verifies that the user has the neccessary permissions

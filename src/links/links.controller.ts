@@ -63,13 +63,12 @@ export class LinksController {
   @Post(':id')
   @HttpCode(HttpStatus.OK)
   async updateLink(
-    @Req() req: IAuthenticatedRequest,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateLinkDto,
   ): Promise<IResponse> {
     // update details for a link, like target and extension with a given ID
     logger.info({ message: `POST /${id} initiated`, body: dto });
-    return this.linksService.updateLink(req, id, dto);
+    return this.linksService.updateLink(id, dto);
   }
 
   @Delete(':id')

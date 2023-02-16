@@ -6,6 +6,7 @@ import { PrismaService } from '../../src/prisma/prisma.service';
 import { IResponse } from '../../types/IResponse';
 import { handlePrismaErrors } from '../../utils/handlePrismaErrors';
 import { getFavicon } from '../../utils/getFavicon';
+import { getTitleTag } from '../../utils/getTitleTag';
 import logger from '../../utils/logger';
 import { GetAppQueryDto, NewLinkDto, UpdateLinkDto } from './links.dto';
 
@@ -104,12 +105,17 @@ export class LinksService {
       });
     }
 
+    // gets the title tag from getTitleTag utility file
+    // if the utility doesn't work for some reason, titleTag will be set to 'Untitled'
+    const titleTag = await getTitleTag(dto.target);
+
     try {
       // creates a new link in the database using prisma
       logger.info(`prisma.link.create in createUserLink initiated`);
       link = await this.prisma.link.create({
         data: {
           target: dto.target,
+          titleTag,
           favicon,
           extension,
           ksn,
@@ -196,11 +202,7 @@ export class LinksService {
   // updates target and extension for a link with a given id
   // in the client side, if only the target or the extension is updated and not the other
   // the client will still send both over tho this method
-  async updateLink(
-    req: IAuthenticatedRequest,
-    id: number,
-    dto: UpdateLinkDto,
-  ): Promise<IResponse> {
+  async updateLink(id: number, dto: UpdateLinkDto): Promise<IResponse> {
     let link: Link;
     let linkChange: any;
     // empty favicon string that will store the favicon url
@@ -219,6 +221,11 @@ export class LinksService {
         error,
       });
     }
+
+    // retrieves the title tag based on the target url
+    // if the target url never changed, then this just serves as a way to update the title tag
+    const titleTag = await getTitleTag(dto.target);
+
     // here we check to see if the extension that was sent over is unique
     // since this method would also take an unchanged extension, we use extensionChanged to know when to check
     if (dto.extensionChanged) {
@@ -251,6 +258,7 @@ export class LinksService {
     const data = {
       extension: dto.extensionChanged ? dto.extension : undefined,
       target: dto.target,
+      titleTag,
       favicon,
     };
 

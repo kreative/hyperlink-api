@@ -4,7 +4,6 @@ import {
   HttpCode,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Req,
 } from '@nestjs/common';
 import logger from '../../utils/logger';

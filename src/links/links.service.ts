@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Link } from '@prisma/client';
 import { customAlphabet } from 'nanoid';
 import { IAuthenticatedRequest } from 'types/IAuthenticatedRequest';

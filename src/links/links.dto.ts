@@ -23,6 +23,10 @@ export class UpdateLinkDto {
   @IsBoolean()
   @IsNotEmpty()
   extensionChanged: boolean;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  public: boolean;
 }
 
 export class GetAppQueryDto {

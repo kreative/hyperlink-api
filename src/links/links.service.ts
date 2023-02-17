@@ -233,6 +233,8 @@ export class LinksService {
 
     // here we check to see if the extension that was sent over is unique
     // since this method would also take an unchanged extension, we use extensionChanged to know when to check
+    // we assume that the extensionChanged variable is correctly sent over by the client
+    // the client needs to send 'true' only if the extension is actually changed
     if (dto.extensionChanged) {
       try {
         // tries to find a link with the given extension
@@ -250,10 +252,8 @@ export class LinksService {
       }
 
       // checks if there is no link with the current extension, if there is then throw error
-      // and if the id of the POST request and the id (link.id) of the found link are the same then nothing happens
-      // this is because that means that updating the extension will have no actual affect on the link
       // if no link is found, extension is unique and the rest of the method can continue
-      if (link !== null && link.id !== id) {
+      if (link !== null) {
         logger.debug(`extension :${dto.extension} taken in updateLink`);
         throw new ForbiddenException('extension taken');
       }
@@ -263,6 +263,7 @@ export class LinksService {
     const data = {
       extension: dto.extensionChanged ? dto.extension : undefined,
       target: dto.target,
+      public: dto.public,
       titleTag,
       favicon,
     };

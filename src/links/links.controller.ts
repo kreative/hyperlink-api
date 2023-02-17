@@ -48,6 +48,15 @@ export class LinksController {
     return this.linksService.createUserLink(req, dto);
   }
 
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async getLink(@Param('id', ParseIntPipe) id: number): Promise<IResponse> {
+    // get a link by ID
+    logger.info(`GET /links/${id} initiated`);
+    return this.linksService.getLink(id);
+  }
+
+
   @Get('')
   @HttpCode(HttpStatus.OK)
   async getLinks(

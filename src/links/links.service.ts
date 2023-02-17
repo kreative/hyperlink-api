@@ -145,6 +145,36 @@ export class LinksService {
     return payload;
   }
 
+  // returns data for a single link from the database
+  async getLink(id: number): Promise<IResponse> {
+    // empty link object that will store the link data
+    let link: Link;
+
+    try {
+      // attempts to retrieve a link from the database
+      logger.info(`prisma.link.findUnique in getLink initiated for ${id}`);
+      link = await this.prisma.link.findUnique({
+        where: { id },
+      });
+    } catch (error) {
+      // some sort of prisma error occured and has been handled
+      logger.error({
+        message: `prisma.link.findUnique in getLink failed for ${id}`,
+        error,
+      });
+      handlePrismaErrors(error);
+    }
+
+    const payload: IResponse = {
+      statusCode: 200,
+      message: 'Link retrieved',
+      data: { link },
+    };
+
+    logger.info({ message: 'getLink passed', payload });
+    return payload;
+  }
+
   // returns ALL links in the Hyperlink database for a specific user
   // eventually we need to implement pagination
   async getLinks(

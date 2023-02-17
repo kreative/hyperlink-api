@@ -40,12 +40,11 @@ model Click {
   os             String? // e.g. Windows 7
   browser        String? // e.g. Chrome
   browserVersion String? // e.g. 17.0.963.79
-  platform       String? // e.g. Microsoft Windows
-  source         String? // e.g. Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.79...
+  ua             String? // e.g. Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.79...
   deviceType     String? // e.g. mobile or desktop
   deviceVendor   String? // e.g. Microsoft
   referralUrl    String? // e.g. https://www.google.com/
-  isBot          Boolean? // e.g. true or false
+  cpu            String? // e.g. amd64
   link           Link     @relation(fields: [linkId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   linkId         Int
 }

@@ -87,6 +87,7 @@ export class LinksService {
     // modifying certain default values from the schema
     const ghost = false;
     const ksn: number = req.kreativeAccount.ksn;
+    const isPublic: boolean = dto.public || false;
 
     // creates a new, unique extension
     const extension: string = await this.generateExtension();
@@ -115,6 +116,7 @@ export class LinksService {
       link = await this.prisma.link.create({
         data: {
           target: dto.target,
+          public: isPublic,
           titleTag,
           favicon,
           extension,

@@ -6,6 +6,8 @@ export class NewLinkDto {
   @IsString()
   @IsUrl()
   target: string;
+
+  public?: boolean;
 }
 
 export class UpdateLinkDto {

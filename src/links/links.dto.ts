@@ -20,6 +20,10 @@ export class UpdateLinkDto {
   @IsString()
   extension: string;
 
+  @IsNotEmpty()
+  @IsString()
+  titleTag: string;
+
   @IsBoolean()
   @IsNotEmpty()
   extensionChanged: boolean;

@@ -257,10 +257,6 @@ export class LinksService {
       });
     }
 
-    // retrieves the title tag based on the target url
-    // if the target url never changed, then this just serves as a way to update the title tag
-    const titleTag = await getTitleTag(dto.target);
-
     // here we check to see if the extension that was sent over is unique
     // since this method would also take an unchanged extension, we use extensionChanged to know when to check
     // we assume that the extensionChanged variable is correctly sent over by the client
@@ -294,7 +290,7 @@ export class LinksService {
       extension: dto.extensionChanged ? dto.extension : undefined,
       target: dto.target,
       public: dto.public,
-      titleTag,
+      titleTag: dto.titleTag,
       favicon,
     };
 

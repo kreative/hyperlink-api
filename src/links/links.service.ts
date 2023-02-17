@@ -163,9 +163,10 @@ export class LinksService {
 
     try {
       // attempts to retrieve all links in the database
+      // we have to pull active links only has "active" tracks whether a user has deleted a link
       logger.info(`prisma.links.findMany initiated for ${ksn}`);
       links = await this.prisma.link.findMany({
-        where: { ksn },
+        where: { ksn, active: true },
         skip: page * limit - limit,
         take: limit,
       });

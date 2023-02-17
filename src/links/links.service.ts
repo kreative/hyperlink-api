@@ -182,7 +182,9 @@ export class LinksService {
     try {
       // attempts to retrieve the total number of links in the database
       logger.info(`prisma.links.count initiated for ${ksn}`);
-      totalLinks = await this.prisma.link.count({ where: { ksn } });
+      totalLinks = await this.prisma.link.count({
+        where: { ksn, active: true },
+      });
     } catch (error) {
       // some sort of prisma error occured
       logger.error({

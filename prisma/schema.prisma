@@ -20,6 +20,7 @@ model Link {
   ghost      Boolean  @default(true)
   target     String
   titleTag   String   @default("Untitled")
+  public     Boolean  @default(true)
   favicon    String?
   ksn        Int?
   clicks     Click[]

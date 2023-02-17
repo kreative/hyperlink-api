@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Response, NextFunction } from 'express';
 import IPinfoWrapper, { IPinfo, ApiLimitError } from 'node-ipinfo';
 import * as requestIp from 'request-ip';
-import { IClientIpinfoRequest } from 'types/IClientIpinfoRequest';
+import { IClickDataRequest } from 'types/IClickDataRequest';
 
 import logger from '../utils/logger';
 
@@ -10,7 +10,7 @@ const ipinfoWrapper = new IPinfoWrapper(process.env.IPINFO_TOKEN);
 
 @Injectable()
 export class IpInfoMiddlewware implements NestMiddleware {
-  use(req: IClientIpinfoRequest, res: Response, next: NextFunction) {
+  use(req: IClickDataRequest, res: Response, next: NextFunction) {
     // get the ip address from the incoming request
     const ipAddress: string = requestIp.getClientIp(req);
     logger.info(`found ipAddress ${ipAddress} for new GET /:extension call`);

@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Click, Link } from '@prisma/client';
 import { LinksService } from '../../src/links/links.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
-import { IClientIpinfoRequest } from '../../types/IClientIpinfoRequest';
+import { IClickDataRequest } from '../../types/IClickDataRequest';
 import { IResponse } from '../../types/IResponse';
 import { handlePrismaErrors } from '../../utils/handlePrismaErrors';
 import logger from '../../utils/logger';
@@ -16,7 +16,7 @@ export class ClicksService {
 
   // creates a click instance, updates clickCount, and sends back link target
   async transformAndCreateClick(
-    req: IClientIpinfoRequest,
+    req: IClickDataRequest,
     extension: string,
   ): Promise<IResponse> {
     let link: Link;
@@ -67,6 +67,14 @@ export class ClicksService {
           postal: ipinfo.postal || null,
           loc: ipinfo.loc || null,
           timezone: ipinfo.timezone || null,
+          os: req.userAgent.os.name || null,
+          browser: req.userAgent.browser.name || null,
+          browserVersion: req.userAgent.browser.version || null,
+          deviceType: req.userAgent.device.model || null,
+          deviceVendor: req.userAgent.device.vendor || null,
+          referralUrl: req.referralUrl || null,
+          ua: req.userAgent.ua || null,
+          cpu: req.userAgent.cpu.architecture || null,
           linkId: link.id,
         },
       });

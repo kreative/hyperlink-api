@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import logger from '../../utils/logger';
 import { ClicksService } from './clicks.service';
-import { IClientIpinfoRequest } from '../../types/IClientIpinfoRequest';
+import { IClickDataRequest } from '../../types/IClickDataRequest';
 import { IResponse } from '../../types/IResponse';
 
 @Controller('clicks')
@@ -18,7 +18,7 @@ export class ClicksController {
   @Get('transform/:extension')
   @HttpCode(HttpStatus.OK)
   async transformAndCreateClick(
-    @Req() req: IClientIpinfoRequest,
+    @Req() req: IClickDataRequest,
     @Param('extension') extension: string,
   ): Promise<IResponse> {
     // creates a new click object, updates the link clickCount, and sends back target

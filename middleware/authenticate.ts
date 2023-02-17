@@ -98,7 +98,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
       .catch((error) => {
         console.log(error);
         // status code is not between 200-299
-        const statusCode = error.response.statusCode;
+        const statusCode = error.response.status;
 
         if (statusCode === 404) {
           // NotFoundException, either account or key isn't found

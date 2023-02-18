@@ -133,8 +133,6 @@ export class LinksService {
       handlePrismaErrors(error);
     }
 
-    console.log(favicon);
-
     const payload: IResponse = {
       statusCode: 200,
       message: 'User link created',

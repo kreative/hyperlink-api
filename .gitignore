@@ -1,6 +1,9 @@
 # enviroment variables
 .env
 
+# new relic logs
+newrelic_agent.log
+
 # compiled output
 /dist
 /node_modules

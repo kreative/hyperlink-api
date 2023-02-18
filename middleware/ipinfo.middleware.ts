@@ -35,13 +35,13 @@ export class IpInfoMiddlewware implements NestMiddleware {
         // a positive response... if no data comes from this middleware, null will be provided in the database
         if (error instanceof ApiLimitError) {
           // this error will happen if we exceed our limit for API usage, shouldn't happen often
-          logger.fatal({
+          logger.error({
             message: `ip lookup for ${ipAddress} failed with ApiLimitError`,
             error,
           });
         } else {
           // this is any sort of other unknown error
-          logger.fatal({
+          logger.error({
             message: `ip lookup for ${ipAddress} failed with unknown error`,
             error,
           });

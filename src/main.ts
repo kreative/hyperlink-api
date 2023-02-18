@@ -34,10 +34,9 @@ async function bootstrap() {
   app.setGlobalPrefix('/v1');
 
   logger.info(
-    `id-api starting on port: ${PORT} enviroment: ${process.env.ENVIROMENT}`,
+    `id-api starting on port: ${PORT} enviroment: ${process.env.NODE_ENV}`,
   );
   await app.listen(PORT);
 }
 
-logger.info(`id-api booting up... [${process.env.ENVIROMENT}]`);
 bootstrap();

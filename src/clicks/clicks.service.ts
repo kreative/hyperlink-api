@@ -86,8 +86,8 @@ export class ClicksService {
     } catch (error) {
       // handles any prisma errors that come up, however we cannot throw errors like we do
       // with the handlePrismaErrors utility, because we still need the user to get to their target url
-      // as a result, we will just log this error as 'fatal'
-      logger.fatal({
+      // as a result, we will just log this error as 'error'
+      logger.error({
         message: `prisma.click.create for ext: ${extension} failed`,
         error,
       });
@@ -110,7 +110,7 @@ export class ClicksService {
       // as with the creation of the click object, we can't throw an error here
       // while this method (like the create click) shouldn't fail, we still need to make sure
       // that the target url for the user is sent back successfully
-      logger.fatal({
+      logger.error({
         message: `prisma.link.update for clickCount failed`,
         error,
       });

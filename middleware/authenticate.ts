@@ -109,7 +109,7 @@ export class AuthenticateMiddleware implements NestMiddleware {
             error,
           });
           res
-            .status(401)
+            .status(404)
             .send({ statusCode: 404, message: 'aidn or key is not found' });
         } else if (statusCode === 401) {
           // UnauthorizedException (the keychain is expired)

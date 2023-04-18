@@ -14,10 +14,8 @@ import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import { IpInfoMiddlewware } from '../middleware/ipinfo.middleware';
 import { ClicksController } from './clicks/clicks.controller';
-import { AuthenticateMiddleware } from '../middleware/authenticate';
 import { ReferrerMiddleware } from '../middleware/referrer.middleware';
 import { UserAgentMiddleware } from '../middleware/useragent.middleware';
-import { LinksController } from './links/links.controller';
 
 @Module({
   imports: [
@@ -43,21 +41,8 @@ export class AppModule implements NestModule {
       path: '*',
       method: RequestMethod.ALL,
     });
-
-    // adds middleware for getting data based on ip info for Clicks controller
     consumer.apply(IpInfoMiddlewware).forRoutes(ClicksController);
-
-    // attaches referral url to request object
     consumer.apply(ReferrerMiddleware).forRoutes(ClicksController);
-
-    // finds, parses, and attaches user agent data to request object
     consumer.apply(UserAgentMiddleware).forRoutes(ClicksController);
-
-    // adds authentication middleware for routes that user's access
-    // the only path that get's exclude is creating a ghost link, all other paths need a user
-    consumer
-      .apply(AuthenticateMiddleware)
-      .exclude({ path: 'v1/links/ghost', method: RequestMethod.POST })
-      .forRoutes(LinksController);
   }
 }

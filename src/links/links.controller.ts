@@ -3,16 +3,15 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
   Req,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { IAuthenticatedRequest } from 'types/IAuthenticatedRequest';
-
+import { UserAuthGuard } from '../../guards/userAuth.guard';
 import { IResponse } from '../../types/IResponse';
 import logger from '../../utils/logger';
 import { NewLinkDto, UpdateLinkDto, GetAppQueryDto } from './links.dto';
@@ -27,7 +26,6 @@ export class LinksController {
   // TODO: add tags to a link, update tags, remove them
 
   @Post('ghost')
-  @HttpCode(HttpStatus.OK)
   async createGhostLink(@Body() dto: NewLinkDto): Promise<IResponse> {
     // creates a new link that doesn't belong to any user
     logger.info({ message: `POST /links/ghost inititated`, body: dto });
@@ -35,7 +33,7 @@ export class LinksController {
   }
 
   @Post('user')
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(new UserAuthGuard(['KREATIVE_HYPERLINK_USER']))
   async createUserLink(
     @Req() req: IAuthenticatedRequest,
     @Body() dto: NewLinkDto,
@@ -49,16 +47,15 @@ export class LinksController {
   }
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(new UserAuthGuard(['KREATIVE_HYPERLINK_USER']))
   async getLink(@Param('id', ParseIntPipe) id: number): Promise<IResponse> {
     // get a link by ID
     logger.info(`GET /links/${id} initiated`);
     return this.linksService.getLink(id);
   }
 
-
   @Get('')
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(new UserAuthGuard(['KREATIVE_HYPERLINK_USER']))
   async getLinks(
     @Req() req: IAuthenticatedRequest,
     @Query() query: GetAppQueryDto,
@@ -70,7 +67,7 @@ export class LinksController {
   }
 
   @Post(':id')
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(new UserAuthGuard(['KREATIVE_HYPERLINK_USER']))
   async updateLink(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateLinkDto,
@@ -81,7 +78,7 @@ export class LinksController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(new UserAuthGuard(['KREATIVE_HYPERLINK_USER']))
   async deactivateLink(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<IResponse> {

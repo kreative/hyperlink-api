@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Param, Req } from '@nestjs/common';
 import logger from '../../utils/logger';
 import { ClicksService } from './clicks.service';
 import { IClickDataRequest } from '../../types/IClickDataRequest';
@@ -16,7 +9,6 @@ export class ClicksController {
   constructor(private clicksService: ClicksService) {}
 
   @Get('transform/:extension')
-  @HttpCode(HttpStatus.OK)
   async transformAndCreateClick(
     @Req() req: IClickDataRequest,
     @Param('extension') extension: string,

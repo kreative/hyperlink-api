@@ -36,11 +36,12 @@ import { UserAgentMiddleware } from '../middleware/useragent.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    // sentry specific middlware
-    consumer.apply(Sentry.Handlers.requestHandler()).forRoutes({
-      path: '*',
-      method: RequestMethod.ALL,
-    });
+    if (process.env.ENVIRONMENT !== 'development') {
+      consumer.apply(Sentry.Handlers.requestHandler()).forRoutes({
+        path: '*',
+        method: RequestMethod.ALL,
+      });
+    }
     consumer.apply(IpInfoMiddlewware).forRoutes(ClicksController);
     consumer.apply(ReferrerMiddleware).forRoutes(ClicksController);
     consumer.apply(UserAgentMiddleware).forRoutes(ClicksController);
